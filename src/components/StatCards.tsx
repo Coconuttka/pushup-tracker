@@ -55,7 +55,7 @@ export function SummaryCards({ stats }: { stats: Statistics }) {
   )
 }
 
-export function DetailedStats({ stats }: { stats: Statistics }) {
+export function DetailedStats({ stats, shared = false }: { stats: Statistics; shared?: boolean }) {
   return (
     <section className="records-grid" aria-label="Personal records">
       {[
@@ -69,7 +69,7 @@ export function DetailedStats({ stats }: { stats: Statistics }) {
           label: 'Best session',
           value: format(stats.bestSession),
           suffix: 'reps',
-          detail: 'Your personal best',
+          detail: shared ? 'Personal best' : 'Your personal best',
         },
         {
           label: 'Best day',
@@ -77,7 +77,9 @@ export function DetailedStats({ stats }: { stats: Statistics }) {
           suffix: 'reps',
           detail: stats.bestDay.key
             ? displayDate(stats.bestDay.key, { month: 'short', day: 'numeric', year: 'numeric' })
-            : 'Your best is ahead of you',
+            : shared
+              ? 'No sessions yet'
+              : 'Your best is ahead of you',
         },
         {
           label: 'Longest streak',

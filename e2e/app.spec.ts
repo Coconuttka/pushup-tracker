@@ -7,6 +7,26 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByText('Opening your workout journal…')).toBeHidden()
 })
 
+test('opens Friends without exposing a directory while signed out and preserves the current counter', async ({
+  page,
+}, testInfo) => {
+  await page.getByRole('button', { name: '+10', exact: true }).click()
+  await page.getByRole('button', { name: 'Friends', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Stronger together.' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Sign in to connect' })).toBeVisible()
+  expect(await page.locator('input[type="checkbox"]').count()).toBe(0)
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  )
+  const results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+    .analyze()
+  expect(results.violations).toEqual([])
+  await page.screenshot({ path: testInfo.outputPath('friends-signed-out.png'), fullPage: true })
+  await page.getByRole('button', { name: 'Track', exact: true }).click()
+  await expect(page.getByLabel('Current session reps')).toHaveText('10')
+})
+
 test('has a responsive, accessible empty state and installable manifest', async ({
   page,
 }, testInfo) => {

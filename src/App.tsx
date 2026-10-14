@@ -9,6 +9,7 @@ import {
   Leaf,
   Settings2,
   ShieldCheck,
+  Users,
   X,
 } from 'lucide-react'
 import { sessionStore } from './data/store'
@@ -25,21 +26,29 @@ import { Heatmap } from './components/Heatmap'
 import { History } from './components/History'
 import { DataTools } from './components/DataTools'
 import { PwaStatus } from './components/PwaStatus'
+import { Friends } from './components/Friends'
+import type { FriendsStore } from './data/friendsStore'
+import type { Invite } from 'dexie-cloud-addon'
 
 const ActivityChart = lazy(() => import('./components/ActivityChart'))
-type View = 'track' | 'progress' | 'history'
+type View = 'track' | 'progress' | 'history' | 'friends'
 const views = [
   { id: 'track', label: 'Track', icon: CirclePlus },
   { id: 'progress', label: 'Progress', icon: BarChart3 },
   { id: 'history', label: 'History', icon: HistoryIcon },
+  { id: 'friends', label: 'Friends', icon: Users },
 ] as const
 
 export default function App({
   store = sessionStore,
   account,
+  friendsStore,
+  friendInvites,
 }: {
   store?: SessionRepository
   account?: AccountControls
+  friendsStore?: FriendsStore
+  friendInvites?: Invite[]
 }) {
   const [view, setView] = useState<View>('track')
   const [count, setCount] = useState(0)
@@ -176,6 +185,12 @@ export default function App({
                   <br />
                   <span className="muted-heading">you’ve come.</span>
                 </>
+              ) : view === 'friends' ? (
+                <>
+                  A little stronger.
+                  <br />
+                  <span className="muted-heading">Together.</span>
+                </>
               ) : (
                 <>
                   Every session.
@@ -189,7 +204,9 @@ export default function App({
                 ? 'Show up. Put in the reps. Build your momentum.'
                 : view === 'progress'
                   ? 'Small steps make a difference. Here’s the proof.'
-                  : 'A record of the work you’ve put in.'}
+                  : view === 'friends'
+                    ? 'Good company. A little encouragement. Every rep counts.'
+                    : 'A record of the work you’ve put in.'}
             </p>
           </div>
           <div className="today-summary" aria-label="Today’s summary" aria-busy={loading}>
@@ -317,12 +334,23 @@ export default function App({
             onTrack={() => setView('track')}
           />
         )}
+        {view === 'friends' && (
+          <Friends
+            store={friendsStore}
+            invites={friendInvites}
+            ownSessions={sessions}
+            now={now}
+            online={online}
+            onSignIn={() => setSettings(true)}
+            notify={setToast}
+          />
+        )}
         <footer className="app-footer">
           <span>
             <ShieldCheck size={15} aria-hidden="true" />
             {online
               ? account?.email
-                ? 'Private to your account. Backed by Dexie Cloud.'
+                ? 'Your account. Your choice of what to share.'
                 : 'Private by design. Saved on this device.'
               : 'You’re offline. Keep going — your sessions save here.'}
           </span>

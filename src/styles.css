@@ -1769,3 +1769,172 @@ input[type='time'] {
 .account-loading h1 {
   font-size: 28px;
 }
+.friends-content {
+  display: grid;
+  gap: 24px;
+}
+.sharing-panel,
+.friend-invitation,
+.friend-comparison {
+  padding: 26px;
+}
+.sharing-panel h2,
+.friend-comparison h2 {
+  font-size: 20px;
+}
+.sharing-panel > p {
+  margin: 12px 0 20px;
+}
+.sharing-summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  line-height: 1.7;
+}
+.sharing-summary svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+  color: var(--accent);
+}
+.friend-invitation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  justify-content: space-between;
+}
+.friend-invitation > div:first-child {
+  flex: 1 1 260px;
+}
+.friend-invitation h3 {
+  margin: 8px 0;
+}
+.friend-invite-status {
+  margin-bottom: 16px;
+}
+.friend-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+}
+.friend-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 96px;
+  padding: 20px;
+  text-align: left;
+  color: inherit;
+}
+.friend-card.selected {
+  border-color: var(--accent);
+  background: #202a19;
+}
+.friend-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #304024;
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.friend-card-name {
+  display: grid;
+  gap: 6px;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.friend-card-name strong {
+  font-size: 17px;
+}
+.friend-streak {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent);
+  margin-left: auto;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.friend-progress > .section-heading h2 {
+  margin-top: 7px;
+  overflow-wrap: anywhere;
+}
+.friend-progress > .section-heading {
+  flex-wrap: wrap;
+}
+.friend-progress .period-grid {
+  margin-bottom: 0;
+}
+.friend-recipients {
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.friend-recipients legend {
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.friend-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  padding: 8px 0;
+  cursor: pointer;
+}
+.friend-check input {
+  min-height: 24px;
+  width: 24px;
+  margin: 0;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+.friend-check > span {
+  display: grid;
+  gap: 4px;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.comparison-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-top: 22px;
+  font-size: 14px;
+}
+.comparison-row > span {
+  overflow-wrap: anywhere;
+}
+.comparison-row meter {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 12px;
+  border: 0;
+  background: #2d3328;
+  border-radius: 6px;
+}
+.comparison-row meter::-webkit-meter-bar {
+  background: #2d3328;
+  border: 0;
+}
+.comparison-row meter::-webkit-meter-optimum-value {
+  background: var(--accent);
+}
+.comparison-row meter::-moz-meter-bar {
+  background: var(--accent);
+}
+@media (max-width: 600px) {
+  .sharing-panel,
+  .friend-invitation,
+  .friend-comparison {
+    padding: 20px;
+  }
+  .friend-progress .chart-heading {
+    flex-wrap: wrap;
+  }
+}

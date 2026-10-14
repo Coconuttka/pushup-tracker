@@ -9,10 +9,12 @@ export default function ActivityChart({
   sessions,
   now,
   compact = false,
+  subject,
 }: {
   sessions: Session[]
   now: Date
   compact?: boolean
+  subject?: string
 }) {
   const [period, setPeriod] = useState<ChartPeriod>('daily')
   const titleId = useId()
@@ -27,11 +29,13 @@ export default function ActivityChart({
         <div>
           <div className="heading-with-icon">
             <TrendingUp size={19} className="accent" aria-hidden="true" />
-            <h2 id={titleId}>{compact ? 'The last 7 days' : 'Your activity'}</h2>
+            <h2 id={titleId}>
+              {subject ? `${subject}’s activity` : compact ? 'The last 7 days' : 'Your activity'}
+            </h2>
           </div>
           <p className="muted small">
             {total
-              ? `${total.toLocaleString()} push-ups. All you.`
+              ? `${total.toLocaleString()} push-ups.${subject ? '' : ' All you.'}`
               : 'Every rep will find its place here.'}
           </p>
         </div>

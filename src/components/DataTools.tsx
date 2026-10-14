@@ -81,7 +81,7 @@ export function DataTools({
         <LockKeyhole size={22} aria-hidden="true" />
         <p>
           {account?.email
-            ? 'Your workouts are stored on this device and synced privately through Dexie Cloud. JSON backups contain your workouts, never sign-in credentials.'
+            ? 'Your workouts are stored on this device and synced through Dexie Cloud. They’re private until you share them in Friends. JSON backups contain only your workouts, never sign-in credentials.'
             : 'Your workouts stay on this device until you sign in and choose to copy your device history. No tracking, just you and your progress.'}
         </p>
       </div>
@@ -226,7 +226,7 @@ export function DataTools({
           {notice}
         </p>
       )}
-      <p className="settings-version">PUSHUP · VERSION 1.1.0 · BUILT FOR THE LONG RUN</p>
+      <p className="settings-version">PUSHUP · VERSION 1.2.0 · BUILT FOR THE LONG RUN</p>
     </Modal>
   )
 }

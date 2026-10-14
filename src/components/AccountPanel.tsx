@@ -34,6 +34,7 @@ export function AccountPanel({
           </p>
           <p className="small muted">
             Workouts belong to your account. Sign in with the same email on your phone and computer.
+            Open Friends to choose whether to share progress.
           </p>
           <div className="settings-buttons">
             <button

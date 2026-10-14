@@ -6,6 +6,7 @@ import { sessionStore } from './data/store'
 import { SignInDialog } from './components/SignInDialog'
 import { syncMessage } from './domain/syncStatus'
 import { watchSyncRecovery } from './data/syncRecovery'
+import { FriendsStore } from './data/friendsStore'
 
 const databaseUrl = import.meta.env.VITE_DEXIE_CLOUD_URL || 'https://ztlilst6w.dexie.cloud'
 const database =
@@ -31,6 +32,7 @@ export function ConnectedWorkspace({ database }: { database: CloudDatabase }) {
     [database],
     database.cloud.userInteraction.value,
   )
+  const invites = useObservable(() => database.cloud.invites, [database], [])
   const [ready, setReady] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
@@ -66,7 +68,28 @@ export function ConnectedWorkspace({ database }: { database: CloudDatabase }) {
     () => (userId ? new CloudSessionStore(database, userId) : undefined),
     [database, userId],
   )
+  const friendsStore = useMemo(
+    () => (userId ? new FriendsStore(database, userId) : undefined),
+    [database, userId],
+  )
   useEffect(() => watchSyncRecovery(database), [database, userId])
+  useEffect(() => {
+    if (!friendsStore || !ready) return
+    let active = true
+    const reconcile = () => {
+      if (database.cloud.currentUser.value.userId !== friendsStore.userId) return
+      void friendsStore.reconcile().catch(() => {
+        if (active && database.cloud.currentUser.value.userId === friendsStore.userId)
+          setError('Your sharing choice could not be applied. Open Friends and sync again.')
+      })
+    }
+    const subscription = database.cloud.events.syncComplete.subscribe(reconcile)
+    reconcile()
+    return () => {
+      active = false
+      subscription.unsubscribe()
+    }
+  }, [database, friendsStore, ready])
   async function run(action: () => Promise<void>) {
     if (lock.current) return
     lock.current = true
@@ -107,6 +130,8 @@ export function ConnectedWorkspace({ database }: { database: CloudDatabase }) {
       <App
         key={userId || 'device'}
         store={cloudStore || sessionStore}
+        friendsStore={friendsStore}
+        friendInvites={invites}
         account={{
           email: userId ? user.email || userId : undefined,
           status: syncMessage(syncState, online),

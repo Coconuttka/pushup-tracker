@@ -11,6 +11,7 @@ class TestDatabase extends Dexie {
   constructor() {
     super(`cloud-test-${crypto.randomUUID()}`)
     this.version(1).stores({ workouts: 'key, owner, createdAt' })
+    this.version(2).stores({ sharingPreferences: 'id' })
   }
 }
 
