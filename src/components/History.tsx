@@ -1,11 +1,12 @@
 import { useMemo, useRef, useState } from 'react'
-import { ArrowDown, Check, Clock3, Pencil, Trash2 } from 'lucide-react'
+import { ArrowDown, Check, Clock3, Pencil, Plus, Trash2 } from 'lucide-react'
 import { groupByDay } from '../domain/statistics'
 import { relativeDay } from '../domain/dates'
 import type { Session } from '../domain/session'
 import { MAX_REPS } from '../domain/session'
 import type { SessionStore } from '../data/store'
 import { Modal } from './Modal'
+import { AddHistorySession } from './AddHistorySession'
 
 interface Props {
   sessions: Session[]
@@ -17,6 +18,7 @@ interface Props {
 
 export function History({ sessions, now, store, notify, onTrack }: Props) {
   const [limit, setLimit] = useState(50)
+  const [adding, setAdding] = useState(false)
   const [editing, setEditing] = useState<Session>()
   const [deleting, setDeleting] = useState<Session>()
   const [reps, setReps] = useState('')
@@ -45,7 +47,7 @@ export function History({ sessions, now, store, notify, onTrack }: Props) {
   }
   return (
     <section aria-label="Session history">
-      <div className="section-heading view-heading">
+      <div className="section-heading view-heading history-heading">
         <div>
           <h2>Your effort, recorded.</h2>
           <p className="muted">
@@ -53,7 +55,10 @@ export function History({ sessions, now, store, notify, onTrack }: Props) {
             Every one matters.
           </p>
         </div>
-        <Clock3 className="accent" size={26} aria-hidden="true" />
+        <button className="button primary history-add-button" onClick={() => setAdding(true)}>
+          <Plus size={18} aria-hidden="true" />
+          Add session
+        </button>
       </div>
       {sessions.length === 0 ? (
         <div className="panel empty-state">
@@ -61,7 +66,7 @@ export function History({ sessions, now, store, notify, onTrack }: Props) {
             <Clock3 size={30} />
           </span>
           <h3>Your story starts with one session.</h3>
-          <p className="muted">Save your first push-ups and they’ll appear here.</p>
+          <p className="muted">Save a session or add push-ups from a previous day.</p>
           <button className="button primary" onClick={onTrack}>
             Log your first session{' '}
             <ArrowDown size={17} className="rotate-arrow" aria-hidden="true" />
@@ -131,6 +136,17 @@ export function History({ sessions, now, store, notify, onTrack }: Props) {
         >
           Show more sessions <ArrowDown size={16} />
         </button>
+      )}
+      {adding && (
+        <AddHistorySession
+          now={now}
+          store={store}
+          onClose={() => setAdding(false)}
+          onSaved={() => {
+            setAdding(false)
+            notify('Session added to your history.')
+          }}
+        />
       )}
       {editing && (
         <Modal title="Edit session" busy={busy} onClose={() => setEditing(undefined)}>

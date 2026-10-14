@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import { PushupDatabase, SessionStore } from './data/store'
+import { addDays, dayKey } from './domain/dates'
 
 vi.mock('./components/ActivityChart', () => ({ default: () => <div>Activity chart</div> }))
 
@@ -113,5 +114,50 @@ describe('session workflow', () => {
     await waitFor(() =>
       expect(screen.getByLabelText('Today’s summary')).toHaveTextContent('0 sessions logged'),
     )
+  })
+
+  it('adds a missed session from an empty history without counting it toward today', async () => {
+    const user = await start()
+    const yesterday = addDays(new Date(), -1)
+    await user.click(screen.getByRole('button', { name: 'History' }))
+    await user.click(screen.getByRole('button', { name: 'Add session' }))
+    expect(screen.getByLabelText('Date')).toHaveValue(dayKey(yesterday))
+    fireEvent.change(screen.getByLabelText('Time'), { target: { value: '12:00' } })
+    await user.type(screen.getByRole('spinbutton', { name: 'Push-ups' }), '25')
+    await user.click(screen.getByRole('button', { name: 'Save session' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    await waitFor(() =>
+      expect(screen.getByRole('region', { name: 'Yesterday' })).toHaveTextContent('25 push-ups'),
+    )
+    expect(screen.getByLabelText('Today’s summary')).toHaveTextContent('0 sessions logged')
+    yesterday.setHours(12, 0, 0, 0)
+    expect((await database.sessions.toArray())[0]).toMatchObject({
+      reps: 25,
+      createdAt: yesterday.getTime(),
+    })
+    await user.click(screen.getByRole('button', { name: 'Progress' }))
+    expect(screen.getByText('1 day current streak', { exact: false })).toBeInTheDocument()
+  })
+
+  it('retains historical form values after a failed save and saves one record on retry', async () => {
+    const spy = vi
+      .spyOn(store, 'createHistorical')
+      .mockRejectedValueOnce(new Error('Storage is full.'))
+    const user = await start()
+    await user.click(screen.getByRole('button', { name: 'History' }))
+    await user.click(screen.getByRole('button', { name: 'Add session' }))
+    fireEvent.change(screen.getByLabelText('Date'), { target: { value: '2024-02-29' } })
+    fireEvent.change(screen.getByLabelText('Time'), { target: { value: '18:45' } })
+    await user.type(screen.getByRole('spinbutton', { name: 'Push-ups' }), '30')
+    await user.click(screen.getByRole('button', { name: 'Save session' }))
+    expect(await screen.findByRole('alert')).toHaveTextContent('Storage is full.')
+    expect(screen.getByLabelText('Date')).toHaveValue('2024-02-29')
+    expect(screen.getByLabelText('Time')).toHaveValue('18:45')
+    expect(screen.getByRole('spinbutton', { name: 'Push-ups' })).toHaveValue(30)
+    expect(await database.sessions.count()).toBe(0)
+    await user.click(screen.getByRole('button', { name: 'Save session' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(spy).toHaveBeenCalledTimes(2)
+    expect(await database.sessions.count()).toBe(1)
   })
 })

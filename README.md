@@ -24,7 +24,7 @@ Visit the preview once online and wait for “Ready to go offline.” Then turn 
 
 - **Track:** add individual reps or use +5, +10, and +20. Save creates one session. Saving is disabled at zero and while persistence is in progress. The counter resets only after IndexedDB commits successfully. A failed save keeps your count for retry.
 - **Progress:** today, Monday-start week, calendar month, and all-time totals and session counts; average reps; best session and day; current and longest streaks; daily, weekly, and monthly charts; a rolling year of daily activity. Every chart includes an exact-value data table.
-- **History:** sessions grouped by local date, newest first, with rep editing and confirmed deletion. Edits preserve the original ID and timestamp. Changes update totals immediately, including in other open tabs.
+- **History:** sessions grouped by local date, newest first, with rep editing and confirmed deletion. Use **Add session** to log a missed workout with its date, local time, and rep count. The form defaults to yesterday and prevents future or invalid local times. Backdated entries update totals, charts, streaks, and the heatmap immediately, including in other open tabs. Edits preserve the original ID and timestamp.
 - **Settings and backups:** JSON export, validated merge import, optional browser storage protection, and installation help.
 
 The unsaved counter remains intact when switching views. Refreshing the page discards unsaved reps; save before refreshing or closing. The app update prompt disables updating while reps are unsaved.

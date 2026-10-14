@@ -1,5 +1,9 @@
 const pad = (value: number) => String(value).padStart(2, '0')
 
+export function timeKey(value: Date): string {
+  return `${pad(value.getHours())}:${pad(value.getMinutes())}`
+}
+
 export function dayKey(value: Date | number): string {
   const date = new Date(value)
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`

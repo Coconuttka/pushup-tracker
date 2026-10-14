@@ -166,3 +166,49 @@ test('keeps narrow layouts usable and settings keyboard accessible', async ({ pa
     true,
   )
 })
+
+test('adds a past session offline, prevents duplicate taps, and updates history and streaks', async ({
+  page,
+  context,
+}, testInfo) => {
+  await page.evaluate(async () => {
+    await navigator.serviceWorker.ready
+  })
+  await expect
+    .poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller)))
+    .toBe(true)
+  await page.getByRole('button', { name: '+10', exact: true }).click()
+  await page.getByRole('button', { name: 'Save 10 push-ups' }).click()
+  await expect(page.getByLabel('Today’s summary')).toContainText('1 session logged')
+  await context.setOffline(true)
+  await page.getByRole('button', { name: 'History', exact: true }).click()
+  await page.getByRole('button', { name: 'Add session', exact: true }).click()
+  await page.getByLabel('Time', { exact: true }).fill('12:00')
+  await page.getByRole('spinbutton', { name: 'Push-ups' }).fill('25')
+  expect(
+    (await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze())
+      .violations,
+  ).toEqual([])
+  await page.screenshot({ path: testInfo.outputPath('add-past-session.png') })
+  await page
+    .getByRole('button', { name: 'Save session', exact: true })
+    .evaluate((button: HTMLButtonElement) => {
+      button.click()
+      button.click()
+    })
+  await expect(page.getByRole('dialog')).toBeHidden()
+  await expect(page.getByRole('region', { name: 'Yesterday', exact: true })).toContainText(
+    '25 push-ups',
+  )
+  await expect(page.getByRole('button', { name: /^Edit .* push-up session/ })).toHaveCount(2)
+  await expect(page.getByLabel('Today’s summary')).toContainText('10')
+  await expect(page.getByLabel('Today’s summary')).toContainText('1 session logged')
+  await page.getByRole('button', { name: 'Progress', exact: true }).click()
+  await expect(page.getByText('2 day current streak', { exact: false })).toBeVisible()
+  await expect(page.locator('.period-card').filter({ hasText: 'All time' })).toContainText('35')
+  await page.reload()
+  await page.getByRole('button', { name: 'History', exact: true }).click()
+  await expect(page.getByRole('region', { name: 'Yesterday', exact: true })).toContainText(
+    '25 push-ups',
+  )
+})

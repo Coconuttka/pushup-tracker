@@ -36,6 +36,31 @@ describe('durable session operations', () => {
     expect(await database.sessions.count()).toBe(2)
   })
 
+  it('persists historical sessions on the selected local day and includes them in statistics', async () => {
+    const saved = await store.createHistorical(25, '2024-02-29', '18:45')
+    expect(saved.createdAt).toBe(new Date(2024, 1, 29, 18, 45).getTime())
+    expect(await database.sessions.get(saved.id)).toEqual(saved)
+    const sessions = await database.sessions.toArray()
+    expect(calculateStatistics(sessions, new Date(2024, 1, 29)).today).toEqual({
+      total: 25,
+      count: 1,
+    })
+    const nextDay = calculateStatistics(sessions, new Date(2024, 2, 1))
+    expect(nextDay.today.total).toBe(0)
+    expect(nextDay.month.total).toBe(0)
+    expect(nextDay.allTime.total).toBe(25)
+    expect(nextDay.currentStreak).toBe(1)
+  })
+
+  it('rejects future or invalid historical entries before writing any data', async () => {
+    await expect(store.createHistorical(20, '9999-12-31', '12:00')).rejects.toThrow(
+      /Future sessions/,
+    )
+    await expect(store.createHistorical(20, '2024-02-30', '12:00')).rejects.toThrow()
+    await expect(store.createHistorical(0, '2024-02-29', '12:00')).rejects.toThrow()
+    expect(await database.sessions.count()).toBe(0)
+  })
+
   it('survives closing and reopening the database', async () => {
     const saved = await store.create(30)
     const name = database.name

@@ -40,6 +40,30 @@ export function createSession(reps: number, now = Date.now(), id = crypto.random
   return validateSession({ id, createdAt: now, reps })
 }
 
+export function historicalTimestamp(date: string, time: string, now = Date.now()): number {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) {
+    throw new Error('Choose a valid date and time for your session.')
+  }
+  const [year, month, day] = date.split('-').map(Number)
+  const [hour, minute] = time.split(':').map(Number)
+  const value = new Date(year, month - 1, day, hour, minute)
+  if (
+    year < 1970 ||
+    value.getFullYear() !== year ||
+    value.getMonth() !== month - 1 ||
+    value.getDate() !== day ||
+    value.getHours() !== hour ||
+    value.getMinutes() !== minute ||
+    value.getTime() < 0
+  ) {
+    throw new Error('Choose a valid date and time that exists in your local timezone.')
+  }
+  if (value.getTime() > now) {
+    throw new Error('Choose a date and time in the past or now. Future sessions cannot be logged.')
+  }
+  return value.getTime()
+}
+
 export function sameSession(a: Session, b: Session): boolean {
   return a.id === b.id && a.createdAt === b.createdAt && a.reps === b.reps
 }

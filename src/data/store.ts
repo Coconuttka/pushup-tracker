@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
-import { createSession, sameSession, validateReps } from '../domain/session'
+import { createSession, historicalTimestamp, sameSession, validateReps } from '../domain/session'
 import type { Session } from '../domain/session'
 import { parseBackup, serializeBackup } from '../domain/backup'
 
@@ -15,10 +15,14 @@ export class PushupDatabase extends Dexie {
 export class SessionStore {
   constructor(readonly database: PushupDatabase) {}
 
-  async create(reps: number): Promise<Session> {
-    const session = createSession(reps)
+  async create(reps: number, createdAt = Date.now()): Promise<Session> {
+    const session = createSession(reps, createdAt)
     await this.database.sessions.add(session)
     return session
+  }
+
+  async createHistorical(reps: number, date: string, time: string): Promise<Session> {
+    return this.create(reps, historicalTimestamp(date, time))
   }
 
   async edit(id: string, reps: number): Promise<void> {
