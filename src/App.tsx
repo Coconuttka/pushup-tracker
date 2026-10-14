@@ -12,7 +12,8 @@ import {
   X,
 } from 'lucide-react'
 import { sessionStore } from './data/store'
-import type { SessionStore } from './data/store'
+import type { SessionRepository } from './data/repository'
+import type { AccountControls } from './components/AccountPanel'
 import { useSessions } from './hooks/useSessions'
 import { useLocalClock } from './hooks/useLocalClock'
 import { useInstall } from './hooks/useInstall'
@@ -33,7 +34,13 @@ const views = [
   { id: 'history', label: 'History', icon: HistoryIcon },
 ] as const
 
-export default function App({ store = sessionStore }: { store?: SessionStore }) {
+export default function App({
+  store = sessionStore,
+  account,
+}: {
+  store?: SessionRepository
+  account?: AccountControls
+}) {
   const [view, setView] = useState<View>('track')
   const [count, setCount] = useState(0)
   const [saving, setSaving] = useState(false)
@@ -137,6 +144,15 @@ export default function App({ store = sessionStore }: { store?: SessionStore }) 
         </div>
       </header>
       <main id="main" className="main-content">
+        {account && (
+          <button className="account-banner" onClick={() => setSettings(true)}>
+            <ShieldCheck size={16} aria-hidden="true" />
+            <span>
+              {account.email ? account.status : 'Sign in to sync your phone and computer'}
+            </span>
+            <ArrowUpRight size={17} aria-hidden="true" />
+          </button>
+        )}
         <div className="page-intro">
           <div>
             <div className="intro-date">
@@ -305,7 +321,9 @@ export default function App({ store = sessionStore }: { store?: SessionStore }) 
           <span>
             <ShieldCheck size={15} aria-hidden="true" />
             {online
-              ? 'Private by design. Saved on this device.'
+              ? account?.email
+                ? 'Private to your account. Backed by Dexie Cloud.'
+                : 'Private by design. Saved on this device.'
               : 'You’re offline. Keep going — your sessions save here.'}
           </span>
           <span className="footer-motto">YOU VS. YESTERDAY.</span>
@@ -340,6 +358,8 @@ export default function App({ store = sessionStore }: { store?: SessionStore }) 
           onClose={() => setSettings(false)}
           notify={setToast}
           installation={installation}
+          account={account}
+          hasUnsaved={count > 0 || saving}
         />
       )}
     </div>

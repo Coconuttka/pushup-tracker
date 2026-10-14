@@ -2,12 +2,12 @@ import { useRef, useState } from 'react'
 import { Check } from 'lucide-react'
 import { addDays, dayKey, timeKey } from '../domain/dates'
 import { MAX_REPS } from '../domain/session'
-import type { SessionStore } from '../data/store'
+import type { SessionRepository } from '../data/repository'
 import { Modal } from './Modal'
 
 interface Props {
   now: Date
-  store: SessionStore
+  store: SessionRepository
   onClose: () => void
   onSaved: () => void
 }

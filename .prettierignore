@@ -6,3 +6,6 @@ coverage
 playwright-report
 test-results
 package-lock.json
+.cloud-admin
+*.key
+dexie-cloud.json

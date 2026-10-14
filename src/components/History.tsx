@@ -4,14 +4,14 @@ import { groupByDay } from '../domain/statistics'
 import { relativeDay } from '../domain/dates'
 import type { Session } from '../domain/session'
 import { MAX_REPS } from '../domain/session'
-import type { SessionStore } from '../data/store'
+import type { SessionRepository } from '../data/repository'
 import { Modal } from './Modal'
 import { AddHistorySession } from './AddHistorySession'
 
 interface Props {
   sessions: Session[]
   now: Date
-  store: SessionStore
+  store: SessionRepository
   notify: (message: string) => void
   onTrack: () => void
 }

@@ -8,3 +8,6 @@ test-results/
 .env
 .env.local
 *.tsbuildinfo
+*.key
+dexie-cloud.json
+.cloud-admin/

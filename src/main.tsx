@@ -1,7 +1,7 @@
 import { Component, StrictMode } from 'react'
 import type { ErrorInfo, ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App'
+import Workspace from './Workspace'
 import './styles.css'
 
 class AppBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
@@ -30,7 +30,7 @@ class AppBoundary extends Component<{ children: ReactNode }, { failed: boolean }
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AppBoundary>
-      <App />
+      <Workspace />
     </AppBoundary>
   </StrictMode>,
 )

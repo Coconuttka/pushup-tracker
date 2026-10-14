@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 import { build, preview } from 'vite'
 
 process.env.VITE_BASE_PATH = '/Pushups/'
+process.env.VITE_CLOUD_ENABLED = 'false'
 await build({ build: { outDir: '.e2e-dist' } })
 const server = await preview({
   build: { outDir: '.e2e-dist' },

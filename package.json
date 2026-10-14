@@ -1,7 +1,7 @@
 {
   "name": "pushup-tracker",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"
@@ -22,6 +22,8 @@
   },
   "dependencies": {
     "dexie": "^4.4.6",
+    "dexie-cloud-addon": "^4.4.15",
+    "dexie-react-hooks": "^4.4.0",
     "lucide-react": "^1.57.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -46,6 +48,7 @@
     "globals": "^17.13.0",
     "jsdom": "^29.1.1",
     "prettier": "^3.9.10",
+    "rxjs": "^7.8.2",
     "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",

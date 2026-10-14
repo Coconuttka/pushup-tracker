@@ -33,6 +33,7 @@ jobs:
       - run: npm run build
         env:
           VITE_BASE_PATH: ${{ vars.VITE_BASE_PATH }}
+          VITE_DEXIE_CLOUD_URL: ${{ vars.VITE_DEXIE_CLOUD_URL }}
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9
         if: github.event_name != 'pull_request'
         with:

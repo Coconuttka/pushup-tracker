@@ -2,6 +2,7 @@ import Dexie, { type EntityTable } from 'dexie'
 import { createSession, historicalTimestamp, sameSession, validateReps } from '../domain/session'
 import type { Session } from '../domain/session'
 import { parseBackup, serializeBackup } from '../domain/backup'
+import type { SessionRepository } from './repository'
 
 export class PushupDatabase extends Dexie {
   sessions!: EntityTable<Session, 'id'>
@@ -12,8 +13,12 @@ export class PushupDatabase extends Dexie {
   }
 }
 
-export class SessionStore {
+export class SessionStore implements SessionRepository {
   constructor(readonly database: PushupDatabase) {}
+
+  list(): Promise<Session[]> {
+    return this.database.sessions.orderBy('createdAt').reverse().toArray()
+  }
 
   async create(reps: number, createdAt = Date.now()): Promise<Session> {
     const session = createSession(reps, createdAt)

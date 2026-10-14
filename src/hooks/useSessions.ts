@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { liveQuery } from 'dexie'
-import type { SessionStore } from '../data/store'
+import type { SessionRepository } from '../data/repository'
 import type { Session } from '../domain/session'
 
-export function useSessions(store: SessionStore) {
+export function useSessions(store: SessionRepository) {
   const [state, setState] = useState<{ sessions: Session[]; loading: boolean; error: string }>({
     sessions: [],
     loading: true,
@@ -11,9 +11,7 @@ export function useSessions(store: SessionStore) {
   })
   const [revision, setRevision] = useState(0)
   useEffect(() => {
-    const subscription = liveQuery(() =>
-      store.database.sessions.orderBy('createdAt').reverse().toArray(),
-    ).subscribe({
+    const subscription = liveQuery(() => store.list()).subscribe({
       next: (sessions) => setState({ sessions, loading: false, error: '' }),
       error: () =>
         setState((previous) => ({

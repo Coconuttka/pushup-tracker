@@ -1,19 +1,29 @@
 import { useRef, useState } from 'react'
 import { Download, HardDrive, LockKeyhole, Smartphone, Upload } from 'lucide-react'
-import type { SessionStore } from '../data/store'
+import type { SessionRepository } from '../data/repository'
+import { AccountPanel, type AccountControls } from './AccountPanel'
 import { parseBackup } from '../domain/backup'
 import { dayKey } from '../domain/dates'
 import { MAX_BACKUP_BYTES } from '../domain/session'
 import { Modal } from './Modal'
 
 interface Props {
-  store: SessionStore
+  store: SessionRepository
+  account?: AccountControls
+  hasUnsaved?: boolean
   onClose: () => void
   notify: (message: string) => void
   installation: { canInstall: boolean; installed: boolean; install: () => Promise<void> }
 }
 
-export function DataTools({ store, onClose, notify, installation }: Props) {
+export function DataTools({
+  store,
+  onClose,
+  notify,
+  installation,
+  account,
+  hasUnsaved = false,
+}: Props) {
   const fileInput = useRef<HTMLInputElement>(null)
   const lock = useRef(false)
   const [busy, setBusy] = useState(false)
@@ -70,9 +80,12 @@ export function DataTools({ store, onClose, notify, installation }: Props) {
       <div className="privacy-note">
         <LockKeyhole size={22} aria-hidden="true" />
         <p>
-          Your workouts stay on this device. No account, no tracking, just you and your progress.
+          {account?.email
+            ? 'Your workouts are stored on this device and synced privately through Dexie Cloud. JSON backups contain your workouts, never sign-in credentials.'
+            : 'Your workouts stay on this device until you sign in and choose to copy your device history. No tracking, just you and your progress.'}
         </p>
       </div>
+      {account && <AccountPanel account={account} hasUnsaved={hasUnsaved || busy} />}
       <section className="settings-section" aria-labelledby="backup-title">
         <div className="heading-with-icon">
           <HardDrive size={18} className="accent" />
@@ -124,8 +137,9 @@ export function DataTools({ store, onClose, notify, installation }: Props) {
               {preview.count === 1 ? '' : 's'}
             </strong>
             <p className="muted small">
-              Backup from {preview.date}. Identical sessions are skipped. Conflicting session IDs
-              stop the entire import; existing data stays intact.
+              Backup from {preview.date}. Identical sessions
+              {account?.email ? ' and previously deleted account sessions' : ''} are skipped.
+              Conflicting session IDs stop the entire import; existing data stays intact.
             </p>
             <div className="settings-buttons">
               <button
@@ -212,7 +226,7 @@ export function DataTools({ store, onClose, notify, installation }: Props) {
           {notice}
         </p>
       )}
-      <p className="settings-version">PUSHUP · VERSION 1.0.0 · BUILT FOR THE LONG RUN</p>
+      <p className="settings-version">PUSHUP · VERSION 1.1.0 · BUILT FOR THE LONG RUN</p>
     </Modal>
   )
 }
