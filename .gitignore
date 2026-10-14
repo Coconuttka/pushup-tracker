@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.e2e-dist/
+.npm-cache/
+coverage/
+playwright-report/
+test-results/
+.env
+.env.local
+*.tsbuildinfo
