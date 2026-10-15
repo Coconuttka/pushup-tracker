@@ -29,7 +29,9 @@ export class FriendsStore {
       this.database.members.toArray(),
     ])
     const approved = directory.filter((entry) => entry.realmId === FRIEND_DIRECTORY_REALM)
-    const memberships = members.filter((member) => member.realmId === progressRealmId(this.userId))
+    const memberships = members.filter(
+      (member) => member.realmId === progressRealmId(this.userId) && member.userId !== this.userId,
+    )
     const peers: FriendProgress[] = []
     for (const realm of realms) {
       if (
@@ -90,7 +92,11 @@ export class FriendsStore {
           name: sharing.name,
           represents: PROGRESS_REALM_KIND,
         })
-        await this.database.members.where('realmId').equals(realmId).delete()
+        const previousMembers = await this.database.members
+          .where('realmId')
+          .equals(realmId)
+          .primaryKeys()
+        if (previousMembers.length) await this.database.members.bulkDelete(previousMembers)
         await this.database.members.bulkAdd(
           sharing.recipients.map((email) => ({ realmId, email, invite: true, permissions: {} })),
         )

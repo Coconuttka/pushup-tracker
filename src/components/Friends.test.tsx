@@ -70,7 +70,7 @@ describe('Friends sharing workflow', () => {
       realm: { realmId, owner: second, name: 'Second', represents: PROGRESS_REALM_KIND },
       accept: vi.fn(async () => {
         await db.members.put({
-          id: 'accepted',
+          id: 'invitation',
           realmId,
           userId: first,
           owner: second,
@@ -159,5 +159,34 @@ describe('Friends sharing workflow', () => {
     expect(await within(review).findByRole('alert')).toHaveTextContent('Could not connect to sync.')
     expect(await db.members.count()).toBe(0)
     expect(await db.sharingPreferences.get(first)).toBeUndefined()
+  })
+  it('reports a server rollback instead of showing a successful share', async () => {
+    sync.mockImplementation(async ({ purpose }: { purpose: string }) => {
+      if (purpose === 'push') {
+        await db.members.clear()
+        await db.realms.clear()
+        await db.sharingPreferences.clear()
+      }
+    })
+    const notify = vi.fn()
+    render(
+      <Friends
+        store={store}
+        now={now}
+        ownSessions={[]}
+        online
+        onSignIn={vi.fn()}
+        notify={notify}
+      />,
+    )
+    const user = userEvent.setup()
+    await user.click(await screen.findByRole('button', { name: 'Share my progress' }))
+    const review = screen.getByRole('dialog', { name: 'A little motivation, shared.' })
+    await user.click(within(review).getByRole('button', { name: 'Share and invite' }))
+    expect(await within(review).findByRole('alert')).toHaveTextContent(
+      'The server did not accept this sharing change. Please try again.',
+    )
+    expect(notify).not.toHaveBeenCalled()
+    expect(within(review).getByRole('button', { name: 'Share and invite' })).toBeEnabled()
   })
 })

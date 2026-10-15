@@ -87,6 +87,20 @@ describe('opt-in friend sharing', () => {
         .sort(),
     ).toEqual([saved.id, imported.id].sort())
   })
+  it('keeps the server-created owner membership out of the invited friends list', async () => {
+    await friends.share('First', [second])
+    await db.members.add({
+      realmId: progressRealmId(first),
+      userId: first,
+      owner: first,
+      accepted: new Date(),
+      permissions: { manage: '*' },
+    })
+    const snapshot = await friends.snapshot()
+    expect(snapshot.memberships).toHaveLength(1)
+    expect(snapshot.memberships[0].email).toBe(second)
+    expect(await db.members.count()).toBe(2)
+  })
   it('revokes memberships, retains workouts and deletion markers, and makes future saves private', async () => {
     const saved = await sessions.create(20)
     const deleted = await sessions.create(10)

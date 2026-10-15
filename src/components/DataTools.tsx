@@ -226,7 +226,7 @@ export function DataTools({
           {notice}
         </p>
       )}
-      <p className="settings-version">PUSHUP · VERSION 1.2.0 · BUILT FOR THE LONG RUN</p>
+      <p className="settings-version">PUSHUP · VERSION 1.2.1 · BUILT FOR THE LONG RUN</p>
     </Modal>
   )
 }

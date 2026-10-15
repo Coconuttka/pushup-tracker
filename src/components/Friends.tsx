@@ -43,7 +43,11 @@ export function Friends({
   )
   const peers = data?.peers || []
   const selected = peers.find((peer) => peer.id === selectedId) || peers[0]
-  async function run(action: () => Promise<void>, message: string) {
+  async function run(
+    action: () => Promise<void>,
+    message: string,
+    confirm?: () => Promise<boolean>,
+  ) {
     if (lock.current || !store) return
     lock.current = true
     setBusy(true)
@@ -56,6 +60,10 @@ export function Friends({
       await action()
       saved = true
       await store.database.cloud.sync({ purpose: 'push', wait: true })
+      if (confirm && !(await confirm())) {
+        saved = false
+        throw new Error('The server did not accept this sharing change. Please try again.')
+      }
       setSharing(false)
       setStopping(false)
       notify(message)
@@ -210,6 +218,7 @@ export function Friends({
                 void run(
                   () => invite.accept(),
                   'Friend connected. Their progress will appear after syncing.',
+                  async () => Boolean((await store.database.members.get(invite.id))?.accepted),
                 )
               }
             >
@@ -218,7 +227,13 @@ export function Friends({
             <button
               className="button secondary"
               disabled={busy || !online}
-              onClick={() => void run(() => invite.reject(), 'Invitation declined.')}
+              onClick={() =>
+                void run(
+                  () => invite.reject(),
+                  'Invitation declined.',
+                  async () => Boolean((await store.database.members.get(invite.id))?.rejected),
+                )
+              }
             >
               Decline
             </button>
@@ -310,6 +325,7 @@ export function Friends({
             void run(
               () => store.share(name, recipients),
               'Progress shared. Your friends can accept their invitations in Friends.',
+              async () => (await store.snapshot()).preference?.enabled === true,
             )
           }
         />
@@ -337,6 +353,7 @@ export function Friends({
                 void run(
                   () => store.stopSharing(),
                   'Sharing stopped. Your workouts remain in your account.',
+                  async () => (await store.snapshot()).preference?.enabled === false,
                 )
               }
             >
