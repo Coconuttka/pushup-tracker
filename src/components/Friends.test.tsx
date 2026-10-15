@@ -104,7 +104,7 @@ describe('Friends sharing workflow', () => {
     await user.click(within(invitation).getByRole('button', { name: 'Accept invitation' }))
     expect(await screen.findByRole('region', { name: 'Second’s progress' })).toBeVisible()
     const history = screen.getByRole('region', { name: 'Second’s session history' })
-    expect(within(history).getByText('35')).toBeVisible()
+    expect(await within(history).findByText('35')).toBeVisible()
     expect(within(history).queryByRole('button', { name: /Edit|Delete/ })).not.toBeInTheDocument()
     expect(screen.getByText('Your workouts are private. Share when you’re ready.')).toBeVisible()
     expect(await db.sharingPreferences.get(first)).toBeUndefined()
