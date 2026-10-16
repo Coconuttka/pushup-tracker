@@ -1771,7 +1771,15 @@ input[type='time'] {
 }
 .friends-content {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 24px;
+  overflow-wrap: anywhere;
+}
+.friends-content > * {
+  min-width: 0;
+}
+.friends-content .section-heading {
+  flex-wrap: wrap;
 }
 .sharing-panel,
 .friend-invitation,

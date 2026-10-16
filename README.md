@@ -108,6 +108,8 @@ Unit and integration tests cover statistics, local calendar and DST boundaries, 
 
 Friends tests cover explicit sharing review, invitation acceptance, read-only progress, recipient validation, duplicate taps, account changes, stopping and restarting sharing, deleted-history privacy, reconciliation of older-device writes, and preserving personal backups. Browser checks include Friends navigation, narrow layouts, accessibility, and retaining the unsaved counter. Before deploying the first sharing release, live checks verified read-only server permissions, private directory access, revocation, and the signed-in review screen for both approved accounts; disposable permission records were removed without reading or changing workouts or sending invitations.
 
+Populated Friends layout tests render the real components with isolated test data at widths from 320 to 1440 pixels. They check that cards fit the viewport at normal zoom, long names wrap, the calendar scrolls within its card, and expanded chart/calendar tables do not widen the page. The fixture is included only in the browser-test build and is not deployed.
+
 The first-share regression test uses the real Dexie Cloud addon and inspects its outgoing mutation log to prevent empty membership deletions. It fails with the original 1.2.0 implementation. UI tests also simulate a server rollback to ensure it reports an error and keeps the share available for retry. The fix was verified against the live service using disposable realm metadata with invitations disabled; no workout records were changed.
 
 ## Create a GitHub repository and deploy

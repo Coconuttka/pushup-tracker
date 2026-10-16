@@ -4,7 +4,17 @@ import { build, preview } from 'vite'
 
 process.env.VITE_BASE_PATH = '/Pushups/'
 process.env.VITE_CLOUD_ENABLED = 'false'
-await build({ build: { outDir: '.e2e-dist' } })
+await build({
+  build: {
+    outDir: '.e2e-dist',
+    rolldownOptions: {
+      input: {
+        app: fileURLToPath(new URL('../index.html', import.meta.url)),
+        friends: fileURLToPath(new URL('../e2e/fixtures/friends.html', import.meta.url)),
+      },
+    },
+  },
+})
 const server = await preview({
   build: { outDir: '.e2e-dist' },
   preview: { host: '127.0.0.1', port: 4173, strictPort: true },
